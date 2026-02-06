@@ -1,41 +1,47 @@
 // Problem: Product of Array Except Self (LeetCode 238)
-// Approach: Prefix product + Suffix product (in-place result array)
-// Pattern: Prefix/Suffix + Array Traversal
+// Approach: Precompute left and right products
+// Pattern: Prefix / Suffix product
 
 /*
 Important idea behind this approach:
 
-1. For each index i, the answer should be:
-      (product of all elements left of i)  ×  (product of all elements right of i)
-2. First pass (left → right):
-      Build prefix products in the result array.
-3. Second pass (right → left):
-      Multiply each position by a running suffix product.
-4. No division is used, and we achieve O(n) time with O(1) extra space
-   (excluding the output array).
+1. Build a 'left' array where left[i] = product of all elements before i.
+2. Build a 'right' array where right[i] = product of all elements after i.
+3. Final answer at index i = left[i] * right[i].
+4. This avoids division and runs in O(n) time.
 */
 
-public class ProductOfArrayExceptSelf {
+class Solution{
 
     public static int[] productExceptSelf(int[] nums) {
 
         int n = nums.length;
-        int[] result = new int[n];
 
-        // Step 1: build prefix products
-        result[0] = 1;
+        // Array to store all left multiplications
+        int[] left = new int[n];
+
+        // Array to store all right multiplications
+        int[] right = new int[n];
+
+        // Build left array
+        left[0] = 1;
         for (int i = 1; i < n; i++) {
-            result[i] = result[i - 1] * nums[i - 1];
+            left[i] = left[i - 1] * nums[i - 1];
         }
 
-        // Step 2: multiply with suffix products
-        int suffix = 1;
-        for (int i = n - 1; i >= 0; i--) {
-            result[i] = result[i] * suffix;
-            suffix = suffix * nums[i];
+        // Build right array
+        right[n - 1] = 1;
+        for (int i = n - 2; i >= 0; i--) {
+            right[i] = right[i + 1] * nums[i + 1];
         }
 
-        return result;
+        // Build final answer
+        int[] ans = new int[n];
+        for (int i = 0; i < n; i++) {
+            ans[i] = left[i] * right[i];
+        }
+
+        return ans;
     }
 
     public static void main(String[] args) {
@@ -51,5 +57,5 @@ public class ProductOfArrayExceptSelf {
 
 /*
 Time Complexity: O(n)
-Space Complexity: O(1) extra space (excluding result array)
+Space Complexity: O(n)   // because of left and right arrays
 */
