@@ -1,43 +1,41 @@
 // Problem: Maximum Subarray (LeetCode 53)
-// Approach: Kadane’s Algorithm (one pass greedy)
+// Approach: Kadane’s Algorithm (one-pass greedy)
 // Pattern: Dynamic Programming on prefix / subarray
 
 /*
 Important idea behind this approach:
 
-1. At every index, decide whether to:
-   - start a new subarray at this element, OR
-   - extend the previous subarray.
-2. We keep:
-   - currentSum → best sum ending at current index
-   - maxSum → best sum seen overall
-3. If currentSum becomes negative, it is better to restart from the current element.
-4. This gives an optimal O(n) solution in a single traversal.
+1. We keep a running sum of the current subarray.
+2. At every step, we extend the subarray by adding nums[i].
+3. If the sum becomes negative, it is useless for future subarrays,
+   so we reset sum = 0.
+4. We keep updating the maximum sum seen so far.
+5. This gives an optimal O(n) time solution.
 */
 
 public class MaximumSubarray {
 
     public static int maxSubArray(int[] nums) {
 
-        int currentSum = nums[0];
-        int maxSum = nums[0];
+        long maxi = Long.MIN_VALUE; // to handle very small values safely
+        int sum = 0;
 
-        for (int i = 1; i < nums.length; i++) {
+        for (int i = 0; i < nums.length; i++) {
 
-            // Either start fresh from nums[i] or extend previous subarray
-            currentSum = Math.max(nums[i], currentSum + nums[i]);
+            sum = sum + nums[i];
 
-            // Update global maximum
-            maxSum = Math.max(maxSum, currentSum);
+            // Update maximum sum found so far
+            if (sum > maxi) {
+                maxi = sum;
+            }
+
+            // If sum becomes negative, reset it
+            if (sum < 0) {
+                sum = 0;
+            }
         }
 
-        return maxSum;
-    }
-
-    public static void main(String[] args) {
-        int[] nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
-
-        System.out.println(maxSubArray(nums)); // Output: 6
+        return (int) maxi;
     }
 }
 
